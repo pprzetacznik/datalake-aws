@@ -1,0 +1,6 @@
+version: 3
+automerge: true
+projects:
+- dir: workspaces/speedwell/persistance
+- dir: workspaces/speedwell/iam
+- dir: workspaces/speedwell/datalake
