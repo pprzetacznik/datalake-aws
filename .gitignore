@@ -1,0 +1,9 @@
+*.tfstate
+*.backup
+*.bak
+*.zip
+*.parquet
+.terraform
+.terraform.lock.hcl
+__pycache__
+env
