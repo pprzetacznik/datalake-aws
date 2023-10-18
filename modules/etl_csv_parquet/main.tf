@@ -23,6 +23,12 @@ resource "aws_lambda_function" "ingestion_lambda_function" {
   runtime = "python3.11"
   handler = "lambda_function.lambda_handler"
   timeout = 10
+  environment {
+    variables = {
+      "LAMBDA_INGESTION_STREAM_NAME" = aws_kinesis_stream.ingestion_raw_stream.name
+      "LAMBDA_INGESTION_STREAM_ARN" = aws_kinesis_stream.ingestion_raw_stream.arn
+    }
+  }
   tags    = var.tags
 }
 
@@ -54,7 +60,7 @@ resource "aws_kinesis_firehose_delivery_stream" "extended_s3_stream" {
   }
 
   extended_s3_configuration {
-    role_arn = var.role_firehose_kinesis_arn
+    role_arn   = var.role_firehose_kinesis_arn
     bucket_arn = "arn:aws:s3:::${var.bucket_name_raw}"
 
     buffering_size = 64
@@ -150,11 +156,11 @@ resource "aws_iam_role_policy" "firehose_role_policy" {
     {
       kinesis_stream_arn    = aws_kinesis_stream.ingestion_raw_stream.arn,
       kinesis_target_bucket = var.bucket_name_raw,
-      aws_account_id = var.aws_account_id,
-      region = var.region,
-      database_name = var.database_name,
-      table_name    = var.table_name,
-      kinesis_stream_name = aws_kinesis_stream.ingestion_raw_stream.name
+      aws_account_id        = var.aws_account_id,
+      region                = var.region,
+      database_name         = var.database_name,
+      table_name            = var.table_name,
+      kinesis_stream_name   = aws_kinesis_stream.ingestion_raw_stream.name
     }
   )
 }

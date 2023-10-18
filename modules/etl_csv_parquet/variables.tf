@@ -23,7 +23,7 @@ variable "aws_account_id" {
 }
 
 variable "tags" {
-  type = map
+  type = map(any)
 }
 
 variable "database_name" {

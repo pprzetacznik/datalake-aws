@@ -44,7 +44,7 @@ resource "aws_iam_user" "speedwell_admin" {
 data "aws_iam_policy_document" "full_access" {
   statement {
     effect    = "Allow"
-    actions = ["*"]
+    actions   = ["*"]
     resources = ["*"]
   }
 }
