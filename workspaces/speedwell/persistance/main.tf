@@ -20,44 +20,16 @@ locals {
   buckets = {
     speedwell-datalake-config-dev = {
       name = "speedwell-speedwell-datalake-config-dev"
-      tags = {
-        tenant      = "speedwell"
-        environment = "dev"
-        component   = "datalake"
-      }
     }
     speedwell-datalake-dev = {
       name = "speedwell-speedwell-datalake-storage-dev"
-      tags = {
-        tenant      = "speedwell"
-        environment = "dev"
-        component   = "datalake"
-      }
     }
     speedwell-datalake-ingestion-dev = {
       name = "speedwell-speedwell-datalake-ingestion-dev"
-      tags = {
-        tenant      = "speedwell"
-        environment = "dev"
-        component   = "datalake"
-      }
     }
     speedwell-datalake-raw-dev = {
       name = "speedwell-speedwell-datalake-raw-dev"
-      tags = {
-        tenant      = "speedwell"
-        environment = "dev"
-        component   = "datalake"
-      }
     }
-    # speedwell-datalake-raw2-dev = {
-    #   name = "speedwell-speedwell-datalake-raw2-dev"
-    #   tags = {
-    #     tenant      = "speedwell"
-    #     environment = "dev"
-    #     component   = "datalake"
-    #   }
-    # }
   }
   tags = {
     tenant      = "speedwell"
@@ -69,7 +41,7 @@ locals {
 resource "aws_s3_bucket" "buckets" {
   for_each = local.buckets
   bucket   = each.value.name
-  tags     = each.value.tags
+  tags     = local.tags
 }
 
 resource "aws_s3_object" "object" {
