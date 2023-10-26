@@ -33,9 +33,9 @@ locals {
     environment = "dev"
     component   = "datalake"
   }
-  role_firehose_kinesis_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/speedwell_firehose_role"
   role_firehose_kinesis_id  = "speedwell_firehose_role"
-  role_ingestion_lambda_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/speedwell_iam_for_lambda"
+  role_firehose_kinesis_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/speedwell_firehose_role"
+  role_ingestion_lambda_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/speedwell_ingestion_lambda"
 }
 
 data "aws_caller_identity" "current" {}

@@ -67,13 +67,6 @@ resource "aws_iam_user" "datalake_de_user" {
   tags = local.tags
 }
 
-resource "aws_iam_role" "datalake_admin_role" {
-  name                  = "speedwell_firehose_role"
-  assume_role_policy    = data.aws_iam_policy_document.speedwell_instance_assume_role_policy.json
-  force_detach_policies = true
-  tags                  = local.tags
-}
-
 data "aws_iam_policy_document" "speedwell_instance_assume_role_policy" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -82,6 +75,13 @@ data "aws_iam_policy_document" "speedwell_instance_assume_role_policy" {
       identifiers = ["firehose.amazonaws.com"]
     }
   }
+}
+
+resource "aws_iam_role" "datalake_admin_role" {
+  name                  = "${local.tenant}_firehose_role"
+  assume_role_policy    = data.aws_iam_policy_document.speedwell_instance_assume_role_policy.json
+  force_detach_policies = true
+  tags                  = local.tags
 }
 
 data "aws_iam_policy_document" "assume_role" {
@@ -96,37 +96,15 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "ingestion_lambda_role" {
-  name               = "${local.tenant}_iam_for_lambda"
+  name               = "${local.tenant}_ingestion_lambda"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  tags               = local.tags
 }
 
 
 resource "aws_iam_role_policy_attachment" "ingestion_lambda_role_attachment" {
   role       = aws_iam_role.ingestion_lambda_role.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
-resource "aws_iam_role_policy" "speedwell_lambda_ingestion_role_policy" {
-  name = "speedwell_lambda_ingestion_role_policy"
-  role = aws_iam_role.ingestion_lambda_role.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "s3:GetBucketLocation",
-          "s3:GetObject",
-          "s3:ListBucket",
-          "s3:ListBucketMultipartUploads"
-        ]
-        Effect = "Allow"
-        Resource = [
-          "arn:aws:s3:::${local.buckets["speedwell-datalake-ingestion-dev"].name}",
-          "arn:aws:s3:::${local.buckets["speedwell-datalake-ingestion-dev"].name}/*"
-        ]
-      },
-    ]
-  })
 }
 
 data "aws_iam_policy_document" "speedwell_lambda_ingestion_s3_config_policy_document" {
@@ -148,10 +126,23 @@ data "aws_iam_policy_document" "speedwell_lambda_ingestion_s3_config_policy_docu
       "*"
     ]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.buckets["speedwell-datalake-ingestion-dev"].name}",
+      "arn:aws:s3:::${local.buckets["speedwell-datalake-ingestion-dev"].name}/*"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "speedwell_lambda_ingestion_s3_config_policy" {
-  name        = "speedwell_lambda_ingestion_s3_config-policy"
+  name        = "${local.tenant}_lambda_ingestion_s3_config_policy"
   description = "Policy allowing lambda to fetch config zip from s3"
   policy      = data.aws_iam_policy_document.speedwell_lambda_ingestion_s3_config_policy_document.json
   tags        = local.tags
